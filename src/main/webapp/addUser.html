@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>添加用户</title>
+    <link rel="stylesheet" href="../ssm/static/layui/css/layui.css" />
+    <script type="text/javascript" src="../ssm/static/layui/layui.js" ></script>
+    <script type="text/javascript" src="../ssm/static/js/jquery.min.js" ></script>
+</head>
+<body>
+<form class="layui-form"  id="test">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="username"  lay-verify="required" placeholder="请输入姓名" autocomplete="off" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="password" name="password" required lay-verify="required|password" placeholder="请输入密码" autocomplete="off" class="layui-input" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">确认密码</label>
+        <div class="layui-input-inline">
+            <input type="password" name="repassword" required lay-verify="required|repassword" placeholder="请确认密码" autocomplete="off" class="layui-input" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="sex" value="男" title="男" />
+            <input type="radio" name="sex" value="女" title="女" checked />
+        </div>
+    </div>
+    <div class="layui-form-item">
+    <label class="layui-form-label">年龄</label>
+    <div class="layui-input-block">
+        <input type="text" name="age"  lay-verify="required" placeholder="请输入年龄" autocomplete="off" class="layui-input"/>
+    </div>
+</div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone"  lay-verify="phone" placeholder="请输入电话号码" autocomplete="off" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-block">
+            <input name="address" placeholder="请输入地址" class="layui-textarea"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo"> 立即提交</button>
+            <button type="reset" class="layui-btn " lay-btn-primary> 重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','layer'],function(){
+        var form=layui.form;
+        var layer=layui.layer;
+        //监听提交
+        form.on('submit(formDemo)',function(data){
+           $.ajax({
+               url:'/ssm/addUser.do',
+               data:$("#test").serialize(),//表单序列化，可以快速获地取表单的全部属性值
+               type:'post',
+               success:function(obj){
+                  if(obj.code==0){
+                      layer.msg("添加成功",{icon:6});
+                      window.location.href="userList.html";
+                  }
+               }
+           });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+        //表单的密码验证
+        form.verify({
+            //我们既支持上述函数式的方式，也支持下述数组的形式
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            password:[
+                /^[\S]{6,12}$/,'密码必须6到12位，且不能出现空格'
+            ],
+            repassword:function(value,item){   //value：表单的值、item：表单的DOM对象
+                if(value!=$('input[name=password]').val()){
+                   return "两次输入的密码不一致";
+               }
+            }
+        });
+    });
+</script>
+</body>
+</html>

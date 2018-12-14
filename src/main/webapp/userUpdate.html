@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../ssm/static/layui/css/layui.css" />
+    <script type="text/javascript" src="../ssm/static/layui/layui.js" ></script>
+    <script type="text/javascript" src="../ssm/static/js/jquery.min.js" ></script>
+    <title>用户更新</title>
+    <script type="text/javascript" >
+        $(function () {
+                //获取请求参数id
+                var url=window.location.href;
+                var uid=url.substring(url.indexOf('uid')+4)
+                //赋值
+                $("#uid").val(uid);
+                //ajax 根据uid查询数据
+                $.ajax({
+                    url:'/ssm/getUser.do',
+                    data:{"uid":uid},
+                    type:'post',
+                    dataType:'json',
+                    cache:false,
+                    success:function (obj) {
+                        //赋值
+                        $("#uid").val(uid);
+                        $("#username").val(obj.username);
+                        $("#password").val(obj.password);
+                        $("#age").val(obj.age);
+                        $("#phone").val(obj.phone);
+                        $("#address").val(obj.address);
+                    }
+                })
+        });
+    </script>
+</head>
+<body>
+<form class="layui-form"  id="form2">
+    <input type="hidden" name="uid"  id="uid" placeholder="请输入密码" autocomplete="off" class="layui-input"/>
+    <input type="hidden" name="password"  id="password" placeholder="请输入密码" autocomplete="off" class="layui-input"/>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="username"  id="username" placeholder="请输入姓名" autocomplete="off" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">年龄</label>
+        <div class="layui-input-block">
+            <input type="text" name="age"  id="age"  placeholder="请输入年龄" autocomplete="off" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">电话</label>
+        <div class="layui-input-block">
+            <input type="text" name="phone"  id="phone" placeholder="请输入电话号码" autocomplete="off" class="layui-input"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">地址</label>
+        <div class="layui-input-block">
+            <input name="address" id="address" placeholder="请输入地址" class="layui-textarea"/>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo"> 更新</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(['form','layer'],function(){
+        var form=layui.form,layer=layui.layer;
+        //监听提交
+        form.on('submit(formDemo)',function(data){
+            $.ajax({
+                url:'/ssm/toUserUpdate.do',
+                data:$("#form2").serialize(),//表单序列化，可以快速获地取表单的全部属性值
+                type:'post',
+                dataType:'json',
+                cache:false,
+                success:function(obj){
+                    if(obj.code==0){
+                        layer.msg("修改成功",{icon:6});
+                        window.parent.location.href="userList.html";
+                    }
+                }
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>全部用户</title>
+    <link rel="stylesheet" href="../ssm/static/layui/css/layui.css" />
+    <script type="text/javascript" src="../ssm/static/layui/layui.js" ></script>
+    <script type="text/javascript" src="../ssm/static/js/jquery.min.js" ></script>
+</head>
+<body>
+<!--搜索内容区域-->
+<div class="layui-container">
+    <div class="layui-row" style="margin-top: 10px">
+      <div class="layui-col-xs3" style="margin-right: 20px">
+          <div class="layui-form-item layui-from-text">
+              <label class="layui-form-label">用户姓名：</label>
+              <div class="layui-input-block">
+                  <input type="text" id="username" name="username" class="layui-input" placeholder="用户名" />
+              </div>
+          </div>
+      </div>
+        <div class="layui-col-xs2">
+        <div class="layui-col-xs3" style="margin-right: 10px">
+            <div class="layui-form-item layui-from-text">
+                <div class="layui-input-block">
+                    <button class="layui-btn" onclick="searchData()"><i class="layui-icon layui-icon-search">搜索</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="layui-col-xs2">
+            <div class="layui-col-xs3" style="margin-right: 20px">
+                <div class="layui-form-item layui-from-text">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" onclick="searchData()"><a href="addUser.html" class="layui-icon layui-icon-add-1">添加用户</a>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="layui-row">
+        <div class="layui-col-md11">
+        <!--表格内容区域开始-->
+        <table id="tabledata" lay-filter="tableup"></table>
+        <!--表格内容区域结束-->
+        <script type="text/html" id="barop">
+            <a  class="layui-btn layui-btn-mini" lay-event="edit">修改</a>
+            <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+        </script>
+    </div>
+    </div>
+<script>
+     var tableIndex;
+     var  form1;
+     layui.use(['table','form'],function (){
+         var  table=layui.table;
+         form1=layui.form;
+         //第一个实例
+         tableIndex=table.render({
+             elem:'#tabledata'//表格的id值
+             ,url:'/ssm/userAll.do'//数据接口
+             ,page:true //开启分页
+             ,cols:[[
+                 {field:'uid',title:'用户ID',sort:true,fixed:'left'}
+                 ,{field:'username',title:'用户名'}
+                 ,{field:'sex',title:'性别'}
+                 ,{field:'age',title:'年龄'}
+                 ,{field:'address',title:'地址'}
+                 ,{field:'phone',title:'电话号码'}
+                 ,{field: 'right',title:'操作',width:350,align:"center",toolbar:'#barop'}
+             ]]
+         });
+         table.on('tool(tableup)',function (obj) { //tool是工具条事件名，test是table原始容器的属性 lay-filter=“对应的值” obj当前行元素对象
+              var data =obj.data;//获取当前行数据 data 属性可以获取当前行的任意属性值
+              if(obj.event=="del"){  //obj.event 获取 lay-event 对应值
+                  layer.confirm('是否确认删除用户？',function (index) {
+                      $.ajax({
+                          url:'/ssm/userDel.do',
+                          type:"post",
+                          data:"uid="+data.uid,
+                          success:function (data) {
+                             if(data.code==0){
+                                 obj.del();//删除表格中的对应行数据
+                                 layer.close(index);
+                                 layer.msg("删除成功",{icon:6});
+                             } else{
+                                 layer.msg("删除失败",{icon:5});
+                             }
+                          }
+                      });
+                  });
+              }else  if(obj.event=="edit"){//修改
+                  location.href="userUpdate.html?uid="+data.uid;
+              }
+         });
+     })
+     function searchData(){
+         tableIndex.reload({
+             where: { //设定异步数据接口的额外参数，任意设
+                 username: $("#username").val()
+                 , type: $("#type").val()
+             }
+             , page: {
+                 curr: 1 //重新从第 1 页开始
+             }
+         });
+     }
+</script>
+</body>
+</html>
